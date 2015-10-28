@@ -9,7 +9,7 @@
             'page callback' => 'drupal_get_form',
             'page arguments' => array('shift_cypher_form'),
             'access callback' => TRUE,
-            'type' => NORMAL_MENU_ITEM,
+            'type' => MENU_NORMAL_ITEM,
         );
 
         $items['shift_cypher_result'] = array(
@@ -55,11 +55,53 @@
    {
        $user_direction = $element['#value'];
        drupal_set_message($user_direction);
-       if (($user_direction != 'Right') && ($user_direction != 'right') && ($user_direction != 'Left') && ($user_direction != 'left')){
+       if (($user_direction != 'Right') && ($user_direction != 'right') && ($user_direction != 'Left') && ($user_direction != 'left'))
+       {
            form_error($element, t("Please enter either Left or Right"));
        }
    }
 
-    function shift_cypher_form_submit() {
+    function shift_cypher_form_submit($form, &$form_state)
+    {
 
+        $shift_value = $form_state['values']['shift_value'];
+        $shift_direction = $form_state['values']['direction'];
+        $phrase = $form_state['values']['phrase'];
+
+        $alphabet = array('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q',
+        'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z');
+
+        $flip = array_flip($alphabet);
+
+        $phrase = str_split($phrase);
+
+        $phrase_count = count($phrase);
+
+        $encrypted_phrase = '';
+
+        for($i = 0; $i < $phrase_count; $i++)
+        {
+            if (($shift_direction == 'Right') || ($shift_direction == 'right'))
+            {
+                $encrypted_phrase .= $alphabet[($flip[$phrase[$i]] + $shift_value) % 26];
+            } else if (($shift_direction == 'Left') || ($shift_direction == 'left'))
+
+            {
+                $reverse_alphabet = rsort($alphabet);
+                $encrypted_phrase .= $reverse_alphabet[($flip[$phrase[$i]] - $shift_value) % 26];
+
+            }
+        }
+
+        $_SESSION['encoded_result'] = 'Thank you. Your shift value is ' . $shift_value . ' and your shift direction is ' . $shift_direction . '. Your encoded phrase is ' . $encrypted_phrase . '.';
+
+        $form_state['redirect'] = 'shift_cypher_result';
     }
+
+
+
+    function shift_cypher_result()
+   {
+       $answer = $_SESSION['encoded_result'];
+       return $answer;
+   }

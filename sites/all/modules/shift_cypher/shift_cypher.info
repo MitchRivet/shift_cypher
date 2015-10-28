@@ -1,0 +1,5 @@
+name = Shift Cypher
+description = Encrypts a user's phrase using the shift Cypher
+package = Shift Cypher
+core = 7.x
+files[] = shift_cypher.module
