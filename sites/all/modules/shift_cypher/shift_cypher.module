@@ -1,0 +1,65 @@
+<?php
+
+    function shift_cypher_menu()
+    {
+        $items = array();
+
+        $items['shift_cypher'] = array(
+            'title' => 'Encrypt your phrase',
+            'page callback' => 'drupal_get_form',
+            'page arguments' => array('shift_cypher_form'),
+            'access callback' => TRUE,
+            'type' => NORMAL_MENU_ITEM,
+        );
+
+        $items['shift_cypher_result'] = array(
+            'title' => 'Here is your encryption',
+            'page callback' => 'shift_cypher_result',
+            'access callback' => TRUE,
+            'type' => MENU_CALLBACK,
+        );
+
+        return $items;
+    }
+
+    function shift_cypher_form() {
+
+        $form['shift_value'] = array(
+            '#title' => 'Shift value',
+            '#type' => 'textfield',
+            '#description' => t('Enter the shift value'),
+        );
+
+        $form['direction'] = array(
+            '#title' => 'Shift direction',
+            '#type' => 'textfield',
+            '#element_validate' => array('direction_validate'),
+            '#description' => t('Enter the direction'),
+        );
+
+        $form['phrase'] = array(
+            '#title' => 'Phrase',
+            '#type' => 'textfield',
+            '#description' => t('Enter the phrase'),
+        );
+
+        $form['submit'] = array(
+            '#type' => 'submit',
+            '#value' => 'Submit',
+        );
+
+        return $form;
+    }
+
+    function direction_validate($element)
+   {
+       $user_direction = $element['#value'];
+       drupal_set_message($user_direction);
+       if (($user_direction != 'Right') && ($user_direction != 'right') && ($user_direction != 'Left') && ($user_direction != 'left')){
+           form_error($element, t("Please enter either Left or Right"));
+       }
+   }
+
+    function shift_cypher_form_submit() {
+
+    }
