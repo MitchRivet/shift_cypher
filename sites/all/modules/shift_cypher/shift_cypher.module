@@ -68,30 +68,43 @@
         $shift_direction = $form_state['values']['direction'];
         $phrase = $form_state['values']['phrase'];
 
-        $alphabet = array('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q',
-        'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z');
+        // make an array of letters from a-z
+        $letters = range('a', 'z');
 
-        $flip = array_flip($alphabet);
+        $input_phrase_array = str_split(strtolower($phrase));
 
-        $phrase = str_split($phrase);
+        $cypher_phrase = array();
 
-        $phrase_count = count($phrase);
+          foreach ($input_phrase_array as $letter) {
+            // if a space or punctiaton character, just push to array
+            if (!in_array($letter, $letters)) {
+              array_push($cypher_phrase, $letter);
+            } else {
+              // find the key of the letter in the letters array
+              $letter_key = array_search($letter, $letters);
 
-        $encrypted_phrase = '';
+              if (strtolower($shift_direction) == "right") {
+                $letter_key += $shift_value;
 
-        for($i = 0; $i < $phrase_count; $i++)
-        {
-            if (($shift_direction == 'Right') || ($shift_direction == 'right'))
-            {
-                $encrypted_phrase .= $alphabet[($flip[$phrase[$i]] + $shift_value) % 26];
-            } else if (($shift_direction == 'Left') || ($shift_direction == 'left'))
+                if ($letter_key > 25) {
 
-            {
-                $reverse_alphabet = rsort($alphabet);
-                $encrypted_phrase .= $reverse_alphabet[($flip[$phrase[$i]] - $shift_value) % 26];
+                  $letter_key -= 26;
+                }
+              }
+              else {
+                $letter_key -= $shift_value;
+                if ($letter_key < 0) {
+                  $letter_key += 26;
+                }
+              }
+              $cypher_letter = $letters[$letter_key];
 
+              array_push($cypher_phrase, $cypher_letter);
             }
-        }
+          }
+
+          // turn the cypher phrase array into a string and store it in the SESSION variable
+         $encrypted_phrase = implode($cypher_phrase);
 
         $_SESSION['encoded_result'] = 'Thank you. Your shift value is ' . $shift_value . ' and your shift direction is ' . $shift_direction . '. Your encoded phrase is ' . $encrypted_phrase . '.';
 
